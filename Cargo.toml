@@ -1,0 +1,22 @@
+[package]
+name = "lgrb-capstone-project"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "lgrb-capstone-project"
+path = "src/main.rs"
+
+[dependencies]
+cortex-m = "0.7.7"
+panic-halt = "0.2.0"
+stm32f4xx-hal = { version = "0.19.0", features = ["stm32f405", "rt"] }
+cortex-m-rt = "0.7.5"
+
+[profile.release]
+debug = true
+lto = true
+
+[profile.dev]
+debug = true
+opt-level = "s"
