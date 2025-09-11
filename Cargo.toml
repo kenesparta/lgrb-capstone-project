@@ -1,23 +1,33 @@
 [package]
+authors = ["Ken Esparta"]
+edition = "2018"
+readme = "README.md"
 name = "lgrb-capstone-project"
 version = "0.1.0"
-edition = "2024"
+
+[dependencies]
+cortex-m = "0.5.8"
+cortex-m-rt = "0.6.5"
+cortex-m-semihosting = "0.3.2"
+panic-halt = "0.2.0"
+
+# Uncomment for the panic example.
+# panic-itm = "0.4.0"
+
+# Uncomment for the allocator example.
+# alloc-cortex-m = "0.3.5"
+
+# Uncomment for the device example.
+# [dependencies.stm32f30x]
+# features = ["rt"]
+# version = "0.7.1"
 
 [[bin]]
 name = "lgrb-capstone-project"
-path = "src/main.rs"
 test = false
-
-[dependencies]
-cortex-m = "0.7.7"
-panic-halt = "0.2.0"
-stm32f4xx-hal = { version = "0.19.0", features = ["stm32f405", "rt"] }
-cortex-m-rt = "0.7.5"
+bench = false
 
 [profile.release]
-debug = true
-lto = true
-
-[profile.dev]
-debug = true
-opt-level = "s"
+codegen-units = 1 # better optimizations
+debug = true # symbols are nice and they don't increase the size on Flash
+lto = true # better optimizations
