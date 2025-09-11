@@ -6,6 +6,7 @@ edition = "2024"
 [[bin]]
 name = "lgrb-capstone-project"
 path = "src/main.rs"
+test = false
 
 [dependencies]
 cortex-m = "0.7.7"

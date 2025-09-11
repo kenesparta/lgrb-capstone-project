@@ -1,4 +1,8 @@
-1. **Install QEMU** (if not already installed):
-    - On Ubuntu/Debian: `sudo apt install qemu-system-arm`
-    - On macOS: `brew install qemu`
-    - On Windows: Download from QEMU website
+# Capstone Project: 
+
+# 🚀 Getting started
+1. Install the tools, please take a look at this [link 🔗](https://docs.rust-embedded.org/book/intro/tooling.html)
+2. Install dgb, openocd and qemu, please take a look at these resources:
+   - [Linux](https://docs.rust-embedded.org/book/intro/install/linux.html)
+   - [Macos](https://docs.rust-embedded.org/book/intro/install/macos.html)
+   - [Windows](https://docs.rust-embedded.org/book/intro/install/windows.html)

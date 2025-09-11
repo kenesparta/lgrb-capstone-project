@@ -1,15 +1,10 @@
 #![no_std]
 #![no_main]
 
-use panic_halt as _; // Panic handler
-use cortex_m_rt::entry; // Runtime entry point
 use cortex_m::asm::delay;
-use stm32f4xx_hal::{
-    gpio::{GpioExt, Output, PushPull},
-    pac,
-    prelude::*,
-    rcc::RccExt,
-};
+use cortex_m_rt::entry; // Runtime entry point
+use panic_halt as _; // Panic handler
+use stm32f4xx_hal::{gpio::GpioExt, pac, prelude::*, rcc::RccExt};
 
 #[entry]
 fn main() -> ! {
@@ -32,7 +27,7 @@ fn main() -> ! {
         // Turn LED on
         led.set_high();
 
-        // Simple delay (not precise, but good enough for blinking)
+        // Simple delay (not precise but good enough for blinking)
         delay(1_000_000);
 
         // Turn LED off
