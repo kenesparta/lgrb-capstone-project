@@ -1,0 +1,23 @@
+[package]
+authors = ["Ken Esparta"]
+edition = "2024"
+readme = "README.md"
+name = "nrf-embed"
+version = "0.1.0"
+
+[dependencies]
+cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
+cortex-m-rt = "0.7.5"
+cortex-m-semihosting = "0.5.0"
+panic-halt = "1.0.0"
+rtt-target = "0.6.1"
+
+[[bin]]
+name = "nrf-embed"
+test = false
+bench = false
+
+[profile.release]
+codegen-units = 1
+debug = true
+lto = true
