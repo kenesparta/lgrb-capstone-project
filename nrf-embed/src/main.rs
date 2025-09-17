@@ -1,79 +1,50 @@
 #![no_std]
 #![no_main]
 
-use defmt_rtt as _;
+mod button;
+mod channel;
+mod led;
+mod time;
+
 use panic_halt as _;
 
+use crate::button::{Button, ButtonDirection};
+use crate::channel::Channel;
+use crate::led::LedTask;
+use crate::time::Ticker;
 use cortex_m_rt::entry;
-use embedded_hal::delay::DelayNs;
-use microbit::{board::Board, display::blocking::Display, hal::Timer};
+use embedded_hal::digital::OutputPin;
+use microbit::board::Board;
+use rtt_target::rtt_init_print;
 
 #[entry]
 fn main() -> ! {
-    if let Some(board) = Board::take() {
-        let mut timer = Timer::new(board.TIMER0);
-        let mut display = Display::new(board.display_pins);
+    rtt_init_print!();
+    let board = Board::take().unwrap();
+    let ticker = Ticker::new(board.RTC0);
+    let (col, mut row) = board.display_pins.degrade();
+    row[0].set_high().unwrap();
+    let button_left = board.buttons.button_a.degrade();
+    let button_right = board.buttons.button_b.degrade();
 
-        #[allow(non_snake_case)]
-        let letter_I = [
-            [0, 1, 1, 1, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 0],
-        ];
+    let channel: Channel<ButtonDirection> = Channel::new();
+    let mut led_task = LedTask::new(col, &ticker, channel.get_receiver());
+    let mut button_left_task = Button::new(
+        button_left,
+        &ticker,
+        ButtonDirection::Left,
+        channel.get_sender(),
+    );
+    let mut button_right_task = Button::new(
+        button_right,
+        &ticker,
+        ButtonDirection::Right,
+        channel.get_sender(),
+    );
 
-        let heart = [
-            [0, 1, 0, 1, 0],
-            [1, 0, 1, 0, 1],
-            [1, 0, 0, 0, 1],
-            [0, 1, 0, 1, 0],
-            [0, 0, 1, 0, 0],
-        ];
-
-        #[allow(non_snake_case)]
-        let letter_R = [
-            [0, 1, 1, 1, 0],
-            [0, 1, 0, 1, 0],
-            [0, 1, 1, 0, 0],
-            [0, 1, 0, 1, 0],
-            [0, 1, 0, 1, 0],
-        ];
-
-        let letter_u = [
-            [1, 0, 0, 0, 1],
-            [1, 0, 0, 0, 1],
-            [1, 0, 0, 0, 1],
-            [1, 0, 0, 0, 1],
-            [0, 1, 1, 1, 0],
-        ];
-
-        let letter_s = [
-            [0, 0, 1, 1, 1],
-            [0, 1, 0, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 0, 1, 0],
-            [1, 1, 1, 0, 0],
-        ];
-
-        let letter_t = [
-            [1, 1, 1, 1, 1],
-            [0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0],
-        ];
-        loop {
-            display.show(&mut timer, letter_I, 1000);
-            display.show(&mut timer, heart, 1000);
-            display.show(&mut timer, letter_R, 1000);
-            display.show(&mut timer, letter_u, 1000);
-            display.show(&mut timer, letter_s, 1000);
-            display.show(&mut timer, letter_t, 1000);
-            display.clear();
-            timer.delay_ms(250_u32);
-        }
+    loop {
+        led_task.poll();
+        button_left_task.poll();
+        button_right_task.poll();
     }
-
-    panic!("End");
 }
