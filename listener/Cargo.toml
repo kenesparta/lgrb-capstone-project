@@ -4,3 +4,6 @@ edition = "2024"
 name = "listener"
 version = "0.1.0"
 readme = "README.md"
+
+[dependencies]
+leptos = { version = "0.8.8", features = ["csr"] }

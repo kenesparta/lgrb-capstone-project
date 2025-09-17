@@ -1,13 +1,7 @@
 [target.thumbv7em-none-eabihf]
-
-rustflags = [
-    "-C", "link-arg=-Tlink.x",
-]
-
-[target.thumbv7m-none-eabi]
 # uncomment this to make `cargo run` execute programs on QEMU
 #runner = "qemu-system-arm -cpu cortex-m3 -gdb tcp::3333 -S -machine lm3s6965evb -nographic -semihosting-config enable=on,target=native -kernel"
-runner = "qemu-system-arm -cpu cortex-m3 -gdb tcp::3333 -machine lm3s6965evb -nographic -semihosting-config enable=on,target=native -kernel"
+#runner = "qemu-system-arm -cpu cortex-m3 -gdb tcp::3333 -machine lm3s6965evb -nographic -semihosting-config enable=on,target=native -kernel"
 
 rustflags = [
     # LLD (shipped with the Rust toolchain) is used as the default linker
@@ -26,5 +20,5 @@ rustflags = [
 ]
 
 [build]
-target = "thumbv7m-none-eabi"
+target = "thumbv7em-none-eabihf"
 #target = "thumbv7em-none-eabihf"
