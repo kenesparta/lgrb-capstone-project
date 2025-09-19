@@ -20,27 +20,19 @@ use rtt_target::rtt_init_print;
 #[entry]
 fn main() -> ! {
     rtt_init_print!();
-    let board = Board::take().unwrap();
-    let ticker = Ticker::new(board.RTC0);
+    let mut board = Board::take().unwrap();
+    Ticker::init(board.RTC0, &mut board.NVIC);
     let (col, mut row) = board.display_pins.degrade();
     row[0].set_high().unwrap();
     let button_left = board.buttons.button_a.degrade();
     let button_right = board.buttons.button_b.degrade();
 
     let channel: Channel<ButtonDirection> = Channel::new();
-    let mut led_task = LedTask::new(col, &ticker, channel.get_receiver());
-    let mut button_left_task = Button::new(
-        button_left,
-        &ticker,
-        ButtonDirection::Left,
-        channel.get_sender(),
-    );
-    let mut button_right_task = Button::new(
-        button_right,
-        &ticker,
-        ButtonDirection::Right,
-        channel.get_sender(),
-    );
+    let mut led_task = LedTask::new(col, channel.get_receiver());
+    let mut button_left_task =
+        Button::new(button_left, ButtonDirection::Left, channel.get_sender());
+    let mut button_right_task =
+        Button::new(button_right, ButtonDirection::Right, channel.get_sender());
 
     loop {
         led_task.poll();

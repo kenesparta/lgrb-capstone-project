@@ -1,5 +1,5 @@
 use crate::channel::Sender;
-use crate::time::{Ticker, Timer};
+use crate::time::Timer;
 use embedded_hal::digital::InputPin;
 use fugit::ExtU64;
 use microbit::hal::gpio::{Floating, Input, Pin};
@@ -10,29 +10,26 @@ pub enum ButtonDirection {
     Right,
 }
 
-pub enum ButtonState<'a> {
+pub enum ButtonState {
     WaitForPress,
-    Debounce(Timer<'a>),
+    Debounce(Timer),
 }
 
 pub struct Button<'a> {
     pin: Pin<Input<Floating>>,
-    ticker: &'a Ticker,
     direction: ButtonDirection,
-    state: ButtonState<'a>,
+    state: ButtonState,
     sender: Sender<'a, ButtonDirection>,
 }
 
 impl<'a> Button<'a> {
     pub fn new(
         pin: Pin<Input<Floating>>,
-        ticker: &'a Ticker,
         direction: ButtonDirection,
         sender: Sender<'a, ButtonDirection>,
     ) -> Self {
         Self {
             pin,
-            ticker,
             direction,
             state: ButtonState::WaitForPress,
             sender,
@@ -44,7 +41,7 @@ impl<'a> Button<'a> {
             ButtonState::WaitForPress => {
                 if self.pin.is_low().unwrap() {
                     self.sender.send(self.direction);
-                    self.state = ButtonState::Debounce(Timer::new(100.millis(), self.ticker))
+                    self.state = ButtonState::Debounce(Timer::new(100.millis()))
                 }
             }
             ButtonState::Debounce(ref timer) => {

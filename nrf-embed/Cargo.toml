@@ -9,6 +9,7 @@ version = "0.1.0"
 cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
 cortex-m-rt = "0.7.5"
 cortex-m-semihosting = "0.5.0"
+critical-section = "1.2.0"
 defmt-rtt = "1.0.0"
 embedded-hal = "1.0.0"
 fugit = "0.3.7"
@@ -27,3 +28,6 @@ bench = false
 codegen-units = 1
 debug = true
 lto = true
+
+[features]
+trigger-overflow = []

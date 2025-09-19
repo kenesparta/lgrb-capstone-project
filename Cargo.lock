@@ -1208,6 +1208,7 @@ dependencies = [
  "cortex-m",
  "cortex-m-rt",
  "cortex-m-semihosting",
+ "critical-section",
  "defmt-rtt",
  "embedded-hal 1.0.0",
  "fugit",
