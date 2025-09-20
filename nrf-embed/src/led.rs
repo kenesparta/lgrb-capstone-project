@@ -1,5 +1,6 @@
 use crate::button::ButtonDirection;
 use crate::channel::Receiver;
+use crate::future::{NewFuture, Poll};
 use crate::time::Timer;
 use embedded_hal::digital::{OutputPin, StatefulOutputPin};
 use fugit::ExtU64;
@@ -51,26 +52,43 @@ impl<'a> LedTask<'a> {
         {
             use crate::time::Ticker;
             let time = Ticker::now();
-            rprintln!("Time: 0x{:x} ticks, {} ms", time.ticks(), time.duration_since_epoch().to_millis());
+            rprintln!(
+                "Time: 0x{:x} ticks, {} ms",
+                time.ticks(),
+                time.duration_since_epoch().to_millis()
+            );
         }
         self.col[self.active_col].toggle().ok();
     }
+}
 
-    pub fn poll(&mut self) {
-        match self.state {
-            LedState::Toggle => {
-                self.toggle();
-                self.state = LedState::Wait(Timer::new(500.millis()));
-            }
-            LedState::Wait(ref timer) => {
-                if timer.is_ready() {
-                    self.state = LedState::Toggle;
+impl NewFuture for LedTask<'_> {
+    type Output = ();
+    fn poll(&mut self, task_id: usize) -> Poll<()> {
+        loop {
+            match self.state {
+                LedState::Toggle => {
+                    self.toggle();
+                    self.state = LedState::Wait(Timer::new(500.millis()));
                 }
-                if let Some(direction) = self.receiver.receive() {
-                    self.shift(direction);
-                    self.state = LedState::Toggle;
+
+                LedState::Wait(ref timer) => {
+                    if timer.is_ready() {
+                        self.state = LedState::Toggle;
+                        continue;
+                    }
+
+                    if let Some(direction) = self.receiver.receive() {
+                        self.shift(direction);
+                        self.state = LedState::Toggle;
+                        continue;
+                    }
+
+                    break;
                 }
             }
         }
+
+        Poll::Pending
     }
 }

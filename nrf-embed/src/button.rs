@@ -1,4 +1,5 @@
 use crate::channel::Sender;
+use crate::future::{NewFuture, Poll};
 use crate::time::Timer;
 use embedded_hal::digital::InputPin;
 use fugit::ExtU64;
@@ -35,20 +36,30 @@ impl<'a> Button<'a> {
             sender,
         }
     }
+}
 
-    pub fn poll(&mut self) {
-        match self.state {
-            ButtonState::WaitForPress => {
-                if self.pin.is_low().unwrap() {
-                    self.sender.send(self.direction);
-                    self.state = ButtonState::Debounce(Timer::new(100.millis()))
+impl NewFuture for Button<'_> {
+    type Output = ();
+    fn poll(&mut self, task_id: usize) -> crate::future::Poll<()> {
+        loop {
+            match self.state {
+                ButtonState::WaitForPress => {
+                    if self.pin.is_low().unwrap() {
+                        self.sender.send(self.direction);
+                        self.state = ButtonState::Debounce(Timer::new(100.millis()));
+                        continue;
+                    }
+                }
+                ButtonState::Debounce(ref timer) => {
+                    if timer.is_ready() && self.pin.is_high().unwrap() {
+                        self.state = ButtonState::WaitForPress;
+                        continue;
+                    }
                 }
             }
-            ButtonState::Debounce(ref timer) => {
-                if timer.is_ready() && self.pin.is_high().unwrap() {
-                    self.state = ButtonState::WaitForPress
-                }
-            }
+            break;
         }
+
+        Poll::Pending
     }
 }

@@ -3,6 +3,9 @@
 
 mod button;
 mod channel;
+mod executor;
+mod future;
+mod gpiote;
 mod led;
 mod time;
 
@@ -10,6 +13,8 @@ use panic_halt as _;
 
 use crate::button::{Button, ButtonDirection};
 use crate::channel::Channel;
+use crate::executor::run_tasks;
+use crate::future::NewFuture;
 use crate::led::LedTask;
 use crate::time::Ticker;
 use cortex_m_rt::entry;
@@ -34,9 +39,7 @@ fn main() -> ! {
     let mut button_right_task =
         Button::new(button_right, ButtonDirection::Right, channel.get_sender());
 
-    loop {
-        led_task.poll();
-        button_left_task.poll();
-        button_right_task.poll();
-    }
+    let mut tasks: [&mut dyn NewFuture<Output = ()>; 3] =
+        [&mut led_task, &mut button_left_task, &mut button_right_task];
+    run_tasks(&mut tasks);
 }
