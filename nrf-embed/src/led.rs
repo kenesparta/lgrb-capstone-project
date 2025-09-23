@@ -16,7 +16,7 @@ impl LedRow {
     }
 
     pub fn shift(&mut self, direction: ButtonDirection) {
-        rprintln!("Button press detected..");
+        rprintln!("Button press detected.. {}", direction);
         // switch off current/old LED
         self.col[self.active_col].set_high();
         self.active_col = match direction {
