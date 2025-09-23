@@ -2,6 +2,7 @@ use crate::button::ButtonDirection;
 use crate::channel::Receiver;
 use crate::future::{NewFuture, Poll};
 use crate::time::Timer;
+use core::task::ready;
 use embedded_hal::digital::{OutputPin, StatefulOutputPin};
 use fugit::ExtU64;
 use microbit::gpio::NUM_COLS;
@@ -64,7 +65,7 @@ impl<'a> LedTask<'a> {
 
 impl NewFuture for LedTask<'_> {
     type Output = ();
-    fn poll(&mut self, task_id: usize) -> Poll<()> {
+    fn poll(&mut self, task_id: usize) -> Poll<Self::Output> {
         loop {
             match self.state {
                 LedState::Toggle => {
@@ -72,13 +73,13 @@ impl NewFuture for LedTask<'_> {
                     self.state = LedState::Wait(Timer::new(500.millis()));
                 }
 
-                LedState::Wait(ref timer) => {
-                    if timer.is_ready() {
+                LedState::Wait(ref mut timer) => {
+                    if let Poll::Ready(()) = timer.poll(task_id) {
                         self.state = LedState::Toggle;
                         continue;
                     }
 
-                    if let Some(direction) = self.receiver.receive() {
+                    if let Poll::Ready(direction) = self.receiver.poll(task_id) {
                         self.shift(direction);
                         self.state = LedState::Toggle;
                         continue;
