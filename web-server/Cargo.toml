@@ -1,0 +1,9 @@
+[package]
+authors = ["Ken Esparta"]
+edition = "2021"
+name = "web-server"
+version = "0.1.0"
+readme = "README.md"
+
+[dependencies]
+leptos = { version = "0.8.8", features = ["csr"] }

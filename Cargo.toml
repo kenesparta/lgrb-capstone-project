@@ -3,5 +3,6 @@ resolver = "3"
 
 members = [
     "nrf-embed",
-    "listener"
+    "listener",
+    "web-server"
 ]
