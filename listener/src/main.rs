@@ -1,23 +1,28 @@
-
 use btleplug::api::{
     bleuuid::BleUuid, Central, CentralEvent, Manager as _, Peripheral as _, ScanFilter,
     WriteType,
 };
 use btleplug::platform::{Adapter, Manager, Peripheral};
 use futures::stream::StreamExt;
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::time;
 use uuid::Uuid;
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ButtonEvent {
+    pub button: String,
+    pub state: String,
+    pub timestamp: u64,
+}
+
 // UUIDs matching your micro:bit server
-// const BUTTON_SERVICE_UUID: &str = "EF680800-9B35-4933-9B10-52FFA9740042";
-// const BUTTON_CHAR_UUID: &str = "EF680801-9B35-4933-9B10-52FFA9740042";
 const BATTERY_SERVICE_UUID: &str = "0000180F-0000-1000-8000-00805F9B34FB";
 const BATTERY_LEVEL_UUID: &str = "00002A19-0000-1000-8000-00805F9B34FB";
-
-// const DEVICE_NAME: &str = "LGR-BLE";
 const DEVICE_NAME: &str = "LGR-BLE";
+const WEB_SERVER_URL: &str = "http://127.0.0.1:3000/api/button";
 
 async fn find_device(adapter: &Adapter) -> Option<Peripheral> {
     println!("🔍 Scanning for {} device...", DEVICE_NAME);
@@ -60,13 +65,59 @@ async fn find_device(adapter: &Adapter) -> Option<Peripheral> {
     None
 }
 
-fn handle_button_notification(data: &[u8]) {
+async fn send_button_event(client: &Client, button: &str, state: &str) {
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as u64;
+
+    let event = ButtonEvent {
+        button: button.to_string(),
+        state: state.to_string(),
+        timestamp,
+    };
+
+    match client.post(WEB_SERVER_URL).json(&event).send().await {
+        Ok(response) => {
+            if response.status().is_success() {
+                println!("📤 Sent {} {} to web server", button, state);
+            } else {
+                println!("❌ Failed to send event: HTTP {}", response.status());
+            }
+        }
+        Err(e) => {
+            println!("❌ Network error sending event: {}", e);
+        }
+    }
+}
+
+fn handle_button_notification(data: &[u8], client: &Client) {
     if !data.is_empty() {
         let value = data[0];
+        let rt = tokio::runtime::Handle::current();
+
         match value {
-            1 => println!("🔴 Button A (LEFT) PRESSED"),
-            2 => println!("🔵 Button B (RIGHT) PRESSED"),
-            0 => println!("⚪ Button RELEASED"),
+            1 => {
+                println!("🔴 Button A (LEFT) PRESSED");
+                let client = client.clone();
+                rt.spawn(async move {
+                    send_button_event(&client, "A", "PRESSED").await;
+                });
+            }
+            2 => {
+                println!("🔵 Button B (RIGHT) PRESSED");
+                let client = client.clone();
+                rt.spawn(async move {
+                    send_button_event(&client, "B", "PRESSED").await;
+                });
+            }
+            0 => {
+                println!("⚪ Button RELEASED");
+                let client = client.clone();
+                rt.spawn(async move {
+                    send_button_event(&client, "ANY", "RELEASED").await;
+                });
+            }
             _ => println!("Unknown button value: {}", value),
         }
     } else {
@@ -74,7 +125,7 @@ fn handle_button_notification(data: &[u8]) {
     }
 }
 
-async fn connect_and_listen(peripheral: &Peripheral) -> Result<(), Box<dyn Error>> {
+async fn connect_and_listen(peripheral: &Peripheral, client: &Client) -> Result<(), Box<dyn Error>> {
     println!("🔗 Connecting to device...");
 
     // Connect to device
@@ -151,6 +202,7 @@ async fn connect_and_listen(peripheral: &Peripheral) -> Result<(), Box<dyn Error
     }
 
     println!("\n🎮 Ready! Press buttons A or B on your micro:bit...");
+    println!("📡 Events will be sent to web browser at http://127.0.0.1:3000");
     println!("Press Ctrl+C to stop\n");
 
     // Listen for notifications
@@ -159,7 +211,7 @@ async fn connect_and_listen(peripheral: &Peripheral) -> Result<(), Box<dyn Error
     loop {
         tokio::select! {
             Some(data) = notification_stream.next() => {
-                handle_button_notification(&data.value);
+                handle_button_notification(&data.value, client);
             }
             _ = tokio::signal::ctrl_c() => {
                 println!("\n🛑 Stopping...");
@@ -173,8 +225,11 @@ async fn connect_and_listen(peripheral: &Peripheral) -> Result<(), Box<dyn Error
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    println!("🚀 Starting BLE Button Tester");
-    println!("{}", "=" .repeat(40));
+    println!("🚀 Starting BLE Button Tester with WebSocket");
+    println!("{}", "=" .repeat(50));
+
+    // Create HTTP client for sending events to web server
+    let client = Client::new();
 
     // Get the first Bluetooth adapter
     let manager = Manager::new().await?;
@@ -190,10 +245,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     };
     println!("Using adapter: {}", adapter.adapter_info().await?);
 
-
     // Find and connect to device
     if let Some(peripheral) = find_device(&adapter).await {
-        match connect_and_listen(&peripheral).await {
+        match connect_and_listen(&peripheral, &client).await {
             Ok(_) => {}
             Err(e) => {
                 println!("❌ Connection error: {}", e);
