@@ -3,10 +3,12 @@
 
 use {defmt_rtt as _, panic_probe as _};
 
-use defmt::{info, warn, unwrap};
+use defmt::{info, unwrap, warn};
 use embassy_executor::Spawner;
 use embassy_futures::select::{select, Either};
-use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel, signal::Signal};
+use embassy_sync::{
+    blocking_mutex::raw::CriticalSectionRawMutex, channel::Channel, signal::Signal,
+};
 use microbit_bsp::{ble::MultiprotocolServiceLayer, Config, Microbit};
 use trouble_host::prelude::*;
 
@@ -50,14 +52,14 @@ struct BatteryService {
 pub mod button_uuids {
     // EF680800-9B35-4933-9B10-52FFA9740042
     pub const SERVICE: [u8; 16] = [
-        0xEF, 0x68, 0x08, 0x00, 0x9B, 0x35, 0x49, 0x33,
-        0x9B, 0x10, 0x52, 0xFF, 0xA9, 0x74, 0x00, 0x42
+        0xEF, 0x68, 0x08, 0x00, 0x9B, 0x35, 0x49, 0x33, 0x9B, 0x10, 0x52, 0xFF, 0xA9, 0x74, 0x00,
+        0x42,
     ];
 
     // EF680801-9B35-4933-9B10-52FFA9740042
     pub const BUTTON_STATE: [u8; 16] = [
-        0xEF, 0x68, 0x08, 0x01, 0x9B, 0x35, 0x49, 0x33,
-        0x9B, 0x10, 0x52, 0xFF, 0xA9, 0x74, 0x00, 0x42
+        0xEF, 0x68, 0x08, 0x01, 0x9B, 0x35, 0x49, 0x33, 0x9B, 0x10, 0x52, 0xFF, 0xA9, 0x74, 0x00,
+        0x42,
     ];
 }
 
@@ -66,8 +68,6 @@ struct ButtonService {
     #[characteristic(uuid = button_uuids::BUTTON_STATE, notify)]
     button_state: u8,
 }
-
-
 
 #[embassy_executor::task]
 async fn mpsl_task(mpsl: &'static MultiprotocolServiceLayer<'static>) -> ! {
@@ -124,10 +124,13 @@ where
     let address = Address::random([0x42, 0x6A, 0xE3, 0x1E, 0x83, 0xE7]);
     info!("Our address = {:?}", address);
 
-    let mut resources: HostResources<DefaultPacketPool, CONNECTIONS_MAX, L2CAP_CHANNELS_MAX> = HostResources::new();
+    let mut resources: HostResources<DefaultPacketPool, CONNECTIONS_MAX, L2CAP_CHANNELS_MAX> =
+        HostResources::new();
     let stack = trouble_host::new(controller, &mut resources).set_random_address(address);
     let Host {
-        mut peripheral, runner, ..
+        mut peripheral,
+        runner,
+        ..
     } = stack.build();
 
     info!("Starting advertising and GATT service");
@@ -135,7 +138,7 @@ where
         name: "LGR-BLE",
         appearance: &appearance::power_device::GENERIC_POWER_DEVICE,
     }))
-        .expect("Failed to create GATT server");
+    .expect("Failed to create GATT server");
 
     let app_task = async {
         loop {
@@ -156,7 +159,9 @@ where
 }
 
 /// This is a background task that is required to run forever alongside any other BLE tasks.
-async fn ble_task<C: Controller, P: PacketPool>(mut runner: Runner<'_, C, P>) -> Result<(), BleHostError<C::Error>> {
+async fn ble_task<C: Controller, P: PacketPool>(
+    mut runner: Runner<'_, C, P>,
+) -> Result<(), BleHostError<C::Error>> {
     runner.run().await
 }
 
@@ -192,10 +197,7 @@ async fn advertise<'a, 'b, C: Controller>(
 }
 
 /// This function will handle the GATT events and button events
-async fn connection_task<P: PacketPool>(
-    server: &Server<'_>,
-    conn: &GattConnection<'_, '_, P>,
-) {
+async fn connection_task<P: PacketPool>(server: &Server<'_>, conn: &GattConnection<'_, '_, P>) {
     let level = server.battery_service.level;
     let button_state = server.button_service.button_state;
 
@@ -224,8 +226,8 @@ async fn connection_task<P: PacketPool>(
                             Ok(reply) => {
                                 info!("[gatt] Sending reply");
                                 reply.send().await
-                            },
-                            Err(e) => warn!("[gatt] error sending response: {:?}", e)
+                            }
+                            Err(e) => warn!("[gatt] error sending response: {:?}", e),
                         }
                     }
                     _ => {

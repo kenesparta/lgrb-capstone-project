@@ -1,7 +1,4 @@
-use btleplug::api::{
-    bleuuid::BleUuid, Central, CentralEvent, Manager as _, Peripheral as _, ScanFilter,
-    WriteType,
-};
+use btleplug::api::{Central, Manager as _, Peripheral as _, ScanFilter};
 use btleplug::platform::{Adapter, Manager, Peripheral};
 use futures::stream::StreamExt;
 use reqwest::Client;
@@ -125,7 +122,10 @@ fn handle_button_notification(data: &[u8], client: &Client) {
     }
 }
 
-async fn connect_and_listen(peripheral: &Peripheral, client: &Client) -> Result<(), Box<dyn Error>> {
+async fn connect_and_listen(
+    peripheral: &Peripheral,
+    client: &Client,
+) -> Result<(), Box<dyn Error>> {
     println!("🔗 Connecting to device...");
 
     // Connect to device
@@ -145,17 +145,26 @@ async fn connect_and_listen(peripheral: &Peripheral, client: &Client) -> Result<
         println!("  🔹 Service {}", service.uuid);
 
         for characteristic in &service.characteristics {
-            let props: Vec<String> = characteristic.properties.iter()
+            let props: Vec<String> = characteristic
+                .properties
+                .iter()
                 .map(|p| format!("{:?}", p))
                 .collect();
-            println!("    └─ Characteristic {} ({})",
-                     characteristic.uuid,
-                     props.join(", "));
+            println!(
+                "    └─ Characteristic {} ({})",
+                characteristic.uuid,
+                props.join(", ")
+            );
 
             // Subscribe to notifications for characteristics that support it
-            if characteristic.properties.contains(btleplug::api::CharPropFlags::NOTIFY) {
-                println!("    📡 Attempting to subscribe to notifications on {}",
-                         characteristic.uuid);
+            if characteristic
+                .properties
+                .contains(btleplug::api::CharPropFlags::NOTIFY)
+            {
+                println!(
+                    "    📡 Attempting to subscribe to notifications on {}",
+                    characteristic.uuid
+                );
 
                 match peripheral.subscribe(&characteristic).await {
                     Ok(_) => {
@@ -163,8 +172,10 @@ async fn connect_and_listen(peripheral: &Peripheral, client: &Client) -> Result<
                         button_char_found = true;
                     }
                     Err(e) => {
-                        println!("    ❌ Failed to subscribe to {}: {}",
-                                 characteristic.uuid, e);
+                        println!(
+                            "    ❌ Failed to subscribe to {}: {}",
+                            characteristic.uuid, e
+                        );
                     }
                 }
             }
@@ -183,7 +194,10 @@ async fn connect_and_listen(peripheral: &Peripheral, client: &Client) -> Result<
         if service.uuid == battery_service_uuid {
             for characteristic in &service.characteristics {
                 if characteristic.uuid == battery_char_uuid
-                    && characteristic.properties.contains(btleplug::api::CharPropFlags::READ) {
+                    && characteristic
+                        .properties
+                        .contains(btleplug::api::CharPropFlags::READ)
+                {
                     match peripheral.read(&characteristic).await {
                         Ok(data) => {
                             if !data.is_empty() {
@@ -226,7 +240,7 @@ async fn connect_and_listen(peripheral: &Peripheral, client: &Client) -> Result<
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     println!("🚀 Starting BLE Button Tester with WebSocket");
-    println!("{}", "=" .repeat(50));
+    println!("{}", "=".repeat(50));
 
     // Create HTTP client for sending events to web server
     let client = Client::new();
