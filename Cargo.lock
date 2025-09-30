@@ -4092,24 +4092,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "web-server"
-version = "0.1.0"
-dependencies = [
- "axum",
- "futures-util",
- "js-sys",
- "leptos",
- "serde",
- "serde_json",
- "tokio",
- "tokio-tungstenite 0.21.0",
- "tower 0.4.13",
- "tower-http 0.5.2",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "web-sys"
 version = "0.3.78"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4376,6 +4358,24 @@ name = "writeable"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea2f10b9bb0928dfb1b42b65e1f9e36f7f54dbdf08457afefb38afcdec4fa2bb"
+
+[[package]]
+name = "ws-server"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "futures-util",
+ "js-sys",
+ "leptos",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-tungstenite 0.21.0",
+ "tower 0.4.13",
+ "tower-http 0.5.2",
+ "wasm-bindgen",
+ "web-sys",
+]
 
 [[package]]
 name = "xml-rs"

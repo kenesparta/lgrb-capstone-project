@@ -1,7 +1,7 @@
 [package]
 authors = ["Ken Esparta"]
 edition = "2021"
-name = "web-server"
+name = "ws-server"
 version = "0.1.0"
 readme = "README.md"
 

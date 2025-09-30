@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebSocket Client</title>
+</head>
+<body>
+<div id="messages"></div>
+<input type="text" id="messageInput" placeholder="Type a message...">
+<button onclick="sendMessage()">Send</button>
+<button onclick="connectWebSocket()">Connect</button>
+<button onclick="disconnectWebSocket()">Disconnect</button>
+
+<script>
+    let socket = null;
+    const messagesDiv = document.getElementById('messages');
+
+    function connectWebSocket() {
+        // Replace with your WebSocket server URL
+        const wsUrl = 'ws://localhost:3000/ws';
+
+        socket = new WebSocket(wsUrl);
+
+        // Connection opened
+        socket.addEventListener('open', function (event) {
+            console.log('Connected to WebSocket server');
+            addMessage('Connected to server', 'system');
+        });
+
+        // Listen for messages
+        socket.addEventListener('message', function (event) {
+            console.log('Message from server:', event.data);
+            addMessage(event.data, 'received');
+        });
+
+        // Connection closed
+        socket.addEventListener('close', function (event) {
+            console.log('Disconnected from WebSocket server');
+            addMessage('Disconnected from server', 'system');
+        });
+
+        // Handle errors
+        socket.addEventListener('error', function (event) {
+            console.error('WebSocket error:', event);
+            addMessage('Connection error', 'error');
+        });
+    }
+
+    function disconnectWebSocket() {
+        if (socket) {
+            socket.close();
+            socket = null;
+        }
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+
+        if (message && socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(message);
+            addMessage(message, 'sent');
+            input.value = '';
+        } else if (!socket || socket.readyState !== WebSocket.OPEN) {
+            addMessage('Not connected to server', 'error');
+        }
+    }
+
+    function addMessage(message, type) {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+        messageElement.className = type;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Allow sending messages with Enter key
+    document.getElementById('messageInput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+
+<style>
+    #messages {
+        height: 300px;
+        border: 1px solid #ccc;
+        overflow-y: auto;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .system { color: blue; }
+    .received { color: green; }
+    .sent { color: black; }
+    .error { color: red; }
+
+    input, button {
+        margin: 5px;
+        padding: 5px;
+    }
+</style>
+</body>
+</html>
