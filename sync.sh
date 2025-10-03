@@ -1,0 +1,1 @@
+rsync -av --exclude target --exclude .git . rpi:~/Documents/lgrb-cp

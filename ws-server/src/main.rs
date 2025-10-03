@@ -24,7 +24,6 @@ pub struct ButtonEvent {
     pub timestamp: u64,
 }
 
-// Shared state for WebSocket connections
 type Clients = Arc<Mutex<HashMap<String, broadcast::Sender<ButtonEvent>>>>;
 
 #[derive(Clone)]
@@ -44,7 +43,6 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
     let (mut sender, mut receiver) = socket.split();
     let mut button_rx = state.button_tx.subscribe();
 
-    // Spawn a task to forward button events to this client
     let send_task = tokio::spawn(async move {
         while let Ok(event) = button_rx.recv().await {
             if let Ok(msg) = serde_json::to_string(&event) {
@@ -55,7 +53,6 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         }
     });
 
-    // Handle incoming messages (if any)
     let recv_task = tokio::spawn(async move {
         while let Some(msg) = receiver.next().await {
             if let Ok(msg) = msg {
@@ -72,7 +69,6 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         }
     });
 
-    // Wait for either task to complete
     tokio::select! {
         _ = send_task => {},
         _ = recv_task => {},
@@ -122,11 +118,11 @@ async fn main() {
         .nest_service("/pkg", ServeDir::new("pkg"))
         .with_state(app_state);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await
         .unwrap();
 
-    println!("🚀 Web server running on http://127.0.0.1:3000");
+    println!("🚀 Web server running on http://0.0.0.0:3000");
 
     axum::serve(listener, app).await.unwrap();
 }

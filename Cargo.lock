@@ -252,6 +252,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2261d10cca569e4643e526d8dc2e62e433cc8aba21ab764233731f8d369bf394"
 
 [[package]]
+name = "ble-listener"
+version = "0.1.0"
+dependencies = [
+ "btleplug",
+ "futures",
+ "reqwest",
+ "serde",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1993,18 +2005,6 @@ name = "linux-raw-sys"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df1d3c3b53da64cf5760482273a98e575c651a67eec7f77df96b5b642de8f039"
-
-[[package]]
-name = "listener"
-version = "0.1.0"
-dependencies = [
- "btleplug",
- "futures",
- "reqwest",
- "serde",
- "tokio",
- "uuid",
-]
 
 [[package]]
 name = "litemap"

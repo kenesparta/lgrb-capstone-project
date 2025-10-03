@@ -2,7 +2,7 @@
 resolver = "3"
 
 members = [
-    "nrf-embed",
-    "listener",
+    "lgrcp-embed",
+    "ble-listener",
     "ws-server"
 ]

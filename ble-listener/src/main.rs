@@ -19,10 +19,10 @@ pub struct ButtonEvent {
 const BATTERY_SERVICE_UUID: &str = "0000180F-0000-1000-8000-00805F9B34FB";
 const BATTERY_LEVEL_UUID: &str = "00002A19-0000-1000-8000-00805F9B34FB";
 const DEVICE_NAME: &str = "LGR-BLE";
-const WEB_SERVER_URL: &str = "http://127.0.0.1:3000/api/button";
+const WEB_SERVER_URL: &str = "http://0.0.0.0:3000/api/button";
 
 async fn find_device(adapter: &Adapter) -> Option<Peripheral> {
-    println!("🔍 Scanning for {} device...", DEVICE_NAME);
+    println!("🔍 Scanning for {} a device...", DEVICE_NAME);
 
     // Start scanning
     adapter
@@ -216,7 +216,7 @@ async fn connect_and_listen(
     }
 
     println!("\n🎮 Ready! Press buttons A or B on your micro:bit...");
-    println!("📡 Events will be sent to web browser at http://127.0.0.1:3000");
+    println!("📡 Events will be sent to the web browser at http://127.0.0.1:3000");
     println!("Press Ctrl+C to stop\n");
 
     // Listen for notifications
