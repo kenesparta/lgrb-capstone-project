@@ -138,7 +138,7 @@ where
         name: "LGR-BLE",
         appearance: &appearance::power_device::GENERIC_POWER_DEVICE,
     }))
-    .expect("Failed to create GATT server");
+    .expect("Failed to create a GATT server");
 
     let app_task = async {
         loop {
@@ -279,5 +279,6 @@ async fn connection_task<P: PacketPool>(server: &Server<'_>, conn: &GattConnecti
             }
         }
     }
+
     info!("[gatt] task finished");
 }

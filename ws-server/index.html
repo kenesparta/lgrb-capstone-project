@@ -31,9 +31,9 @@
     </script>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
-<div class="container mx-auto max-w-5xl p-6">
+<div class="container mx-auto max-w-5xl p-4">
     <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6">
         <div class="text-center">
             <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-2">
                 🦀 Let's Get Rusty | Capstone Project
@@ -45,7 +45,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Connection Status Section -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 h-fit">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 h-fit">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,12 +94,93 @@
                     </button>
                 </div>
             </div>
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 h-fit">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-slate-800">Button Statistics</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Button A Counter -->
+                    <div class="p-4 bg-red-50 rounded-lg border border-red-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold">
+                                    A
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-slate-900">Button A</div>
+                                    <div class="text-sm text-slate-600">Left Button</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-red-600" id="button-a-count">0</div>
+                                <div class="text-xs text-slate-500">clicks</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Button B Counter -->
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold">
+                                    B
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-slate-900">Button B</div>
+                                    <div class="text-sm text-slate-600">Right Button</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-blue-600" id="button-b-count">0</div>
+                                <div class="text-xs text-slate-500">clicks</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Counter -->
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center text-white">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-slate-900">Total</div>
+                                    <div class="text-sm text-slate-600">All Buttons</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-slate-700" id="total-count">0</div>
+                                <div class="text-xs text-slate-500">clicks</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reset Statistics Button -->
+                    <button onclick="resetStatistics()"
+                            class="w-full px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg
+                                       transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/20">
+                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Reset Statistics
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Button Events Section -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <div class="flex items-center justify-between mb-6">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+                <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +203,7 @@
                     <div class="col-span-3 text-right">Timestamp</div>
                 </div>
 
-                <div id="events-list" class="space-y-3 max-h-96 overflow-y-auto">
+                <div id="events-list" class="space-y-3 max-h-9/10 overflow-y-auto">
                     <div class="text-center py-16 text-slate-500">
                         <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
@@ -140,6 +221,9 @@
     let socket = null;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
+
+    let buttonACount = 0;
+    let buttonBCount = 0;
 
     function updateStatus(status, text) {
         const indicator = document.getElementById('status-indicator');
@@ -166,12 +250,24 @@
         statusText.textContent = text;
     }
 
+    function updateStatistics() {
+        document.getElementById('button-a-count').textContent = buttonACount;
+        document.getElementById('button-b-count').textContent = buttonBCount;
+        document.getElementById('total-count').textContent = buttonACount + buttonBCount;
+    }
+
+    function resetStatistics() {
+        buttonACount = 0;
+        buttonBCount = 0;
+        updateStatistics();
+    }
+
     function connect() {
         if (socket && socket.readyState === WebSocket.OPEN) {
             return;
         }
         updateStatus('connecting', 'Connecting...');
-        socket = new WebSocket('ws://192.168.77.107:3000/ws');
+        socket = new WebSocket('ws://192.168.77.109:3000/ws');
 
         socket.onopen = function(event) {
             updateStatus('connected', 'Connected');
@@ -213,6 +309,15 @@
 
     function addEvent(event) {
         const eventsList = document.getElementById('events-list');
+
+        if (event.state.toLowerCase() === 'pressed') {
+            if (event.button.toLowerCase() === 'a') {
+                buttonACount++;
+            } else if (event.button.toLowerCase() === 'b') {
+                buttonBCount++;
+            }
+            updateStatistics();
+        }
 
         if (eventsList.children.length === 1 && eventsList.firstElementChild.textContent.includes('No Events Recorded')) {
             eventsList.innerHTML = '';
@@ -281,6 +386,7 @@
 
     window.addEventListener('load', function() {
         connect();
+        updateStatistics();
     });
 </script>
 </body>

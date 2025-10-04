@@ -15,7 +15,6 @@ pub struct ButtonEvent {
     pub timestamp: u64,
 }
 
-// UUIDs matching your micro:bit server
 const BATTERY_SERVICE_UUID: &str = "0000180F-0000-1000-8000-00805F9B34FB";
 const BATTERY_LEVEL_UUID: &str = "00002A19-0000-1000-8000-00805F9B34FB";
 const DEVICE_NAME: &str = "LGR-BLE";
@@ -24,7 +23,6 @@ const WEB_SERVER_URL: &str = "http://0.0.0.0:3000/api/button";
 async fn find_device(adapter: &Adapter) -> Option<Peripheral> {
     println!("🔍 Scanning for {} a device...", DEVICE_NAME);
 
-    // Start scanning
     adapter
         .start_scan(ScanFilter::default())
         .await
@@ -32,7 +30,6 @@ async fn find_device(adapter: &Adapter) -> Option<Peripheral> {
 
     time::sleep(Duration::from_secs(10)).await;
 
-    // Get discovered devices
     let peripherals = adapter.peripherals().await.unwrap();
 
     if peripherals.is_empty() {
@@ -42,7 +39,6 @@ async fn find_device(adapter: &Adapter) -> Option<Peripheral> {
 
     println!("Found {} BLE devices:", peripherals.len());
 
-    // Find our target device
     for peripheral in peripherals {
         let properties = peripheral.properties().await.unwrap();
         let name = properties
@@ -128,11 +124,9 @@ async fn connect_and_listen(
 ) -> Result<(), Box<dyn Error>> {
     println!("🔗 Connecting to device...");
 
-    // Connect to device
     peripheral.connect().await?;
     println!("🔗 Connected: {}", peripheral.is_connected().await?);
 
-    // Discover services
     peripheral.discover_services().await?;
     let services = peripheral.services();
 
@@ -140,7 +134,6 @@ async fn connect_and_listen(
 
     let mut button_char_found = false;
 
-    // Iterate through services and characteristics
     for service in &services {
         println!("  🔹 Service {}", service.uuid);
 
@@ -156,7 +149,6 @@ async fn connect_and_listen(
                 props.join(", ")
             );
 
-            // Subscribe to notifications for characteristics that support it
             if characteristic
                 .properties
                 .contains(btleplug::api::CharPropFlags::NOTIFY)
@@ -186,7 +178,6 @@ async fn connect_and_listen(
         return Err("❌ No notify characteristics found!".into());
     }
 
-    // Try to read battery level
     let battery_service_uuid = Uuid::parse_str(BATTERY_SERVICE_UUID)?;
     let battery_char_uuid = Uuid::parse_str(BATTERY_LEVEL_UUID)?;
 
@@ -219,7 +210,6 @@ async fn connect_and_listen(
     println!("📡 Events will be sent to the web browser at http://127.0.0.1:3000");
     println!("Press Ctrl+C to stop\n");
 
-    // Listen for notifications
     let mut notification_stream = peripheral.notifications().await?;
 
     loop {
@@ -242,10 +232,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("🚀 Starting BLE Button Tester with WebSocket");
     println!("{}", "=".repeat(50));
 
-    // Create HTTP client for sending events to web server
     let client = Client::new();
-
-    // Get the first Bluetooth adapter
     let manager = Manager::new().await?;
     let adapter_list = manager.adapters().await?;
 
@@ -259,7 +246,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     };
     println!("Using adapter: {}", adapter.adapter_info().await?);
 
-    // Find and connect to device
     if let Some(peripheral) = find_device(&adapter).await {
         match connect_and_listen(&peripheral, &client).await {
             Ok(_) => {}
@@ -268,7 +254,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
         }
 
-        // Disconnect
         if peripheral.is_connected().await? {
             peripheral.disconnect().await?;
         }
