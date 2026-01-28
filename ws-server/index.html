@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -262,12 +261,20 @@
         updateStatistics();
     }
 
+    function getWebSocketUrl() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        return `${protocol}//${host}/ws`;
+    }
+
     function connect() {
         if (socket && socket.readyState === WebSocket.OPEN) {
             return;
         }
         updateStatus('connecting', 'Connecting...');
-        socket = new WebSocket('ws://192.168.77.109:3000/ws');
+        const wsUrl = getWebSocketUrl();
+        console.log('Connecting to:', wsUrl);
+        socket = new WebSocket(wsUrl);
 
         socket.onopen = function(event) {
             updateStatus('connected', 'Connected');
@@ -279,7 +286,7 @@
                 const buttonEvent = JSON.parse(event.data);
                 addEvent(buttonEvent);
             } catch (e) {
-                throw "Error parsing WebSocket message"
+                console.error("Error parsing WebSocket message:", e);
             }
         };
 
@@ -332,7 +339,7 @@
             eventDiv.classList.add('border-l-4', 'border-l-blue-500');
         }
 
-        const date = new Date(event.timestamp);
+        const date = new Date(event.timestamp * 1000);
         const timeStr = date.toLocaleTimeString();
         const dateStr = date.toLocaleDateString();
 
