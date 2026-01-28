@@ -10,10 +10,6 @@ use axum::{
 };
 use futures_util::{sink::SinkExt, stream::StreamExt};
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
 use axum::extract::ws::Utf8Bytes;
 use tokio::sync::broadcast;
 use tower_http::services::ServeDir;
@@ -25,11 +21,8 @@ pub struct ButtonEvent {
     pub timestamp: u64,
 }
 
-type Clients = Arc<Mutex<HashMap<String, broadcast::Sender<ButtonEvent>>>>;
-
 #[derive(Clone)]
 struct AppState {
-    clients: Clients,
     button_tx: broadcast::Sender<ButtonEvent>,
 }
 
@@ -99,10 +92,8 @@ async fn button_event(
 #[tokio::main]
 async fn main() {
     let (button_tx, _) = broadcast::channel(100);
-    let clients = Arc::new(Mutex::new(HashMap::new()));
 
     let app_state = AppState {
-        clients: clients.clone(),
         button_tx: button_tx.clone(),
     };
 

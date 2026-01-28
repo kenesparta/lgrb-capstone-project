@@ -158,7 +158,7 @@ where
     select(ble_task(runner), app_task).await;
 }
 
-/// This is a background task that is required to run forever alongside any other BLE tasks.
+/// This is a background task required to run forever alongside any other BLE tasks.
 async fn ble_task<C: Controller, P: PacketPool>(
     mut runner: Runner<'_, C, P>,
 ) -> Result<(), BleHostError<C::Error>> {
