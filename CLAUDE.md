@@ -60,10 +60,10 @@ make logs-ble             # Tail ble-listener logs
 # Terminal 1: Start server
 cargo run -p ws-server
 
-# Terminal 2: Send mock event
+# Terminal 2: Send mock event (timestamp in milliseconds)
 curl -X POST http://localhost:3000/api/button \
   -H 'Content-Type: application/json' \
-  -d '{"button":"A","state":"pressed","timestamp":1728011234}'
+  -d '{"button":"A","state":"pressed","timestamp":1728011234000}'
 
 # Open http://localhost:3000/ to see dashboard
 ```
@@ -84,7 +84,7 @@ curl -X POST http://localhost:3000/api/button \
 {
   "button": "A|B|ANY",
   "state": "PRESSED|RELEASED",
-  "timestamp": 1728011234
+  "timestamp": 1728011234000
 }
 ```
 

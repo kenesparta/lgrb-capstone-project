@@ -61,7 +61,7 @@ You can exercise the web stack even without hardware by posting mock events to w
 3) Post a test event (in another terminal):
    - curl -X POST http://localhost:3000/api/button \
        -H 'Content-Type: application/json' \
-       -d '{"button":"A","state":"pressed","timestamp":1728011234}'
+       -d '{"button":"A","state":"pressed","timestamp":1728011234000}'
 
 You should see the event appear in the dashboard’s live feed and charts.
 
