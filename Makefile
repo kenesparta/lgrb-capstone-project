@@ -13,6 +13,12 @@ run: build-ws-server build-ble-listener
 	@echo "ble-listener logs: logs/ble-listener.log"
 	@echo "Use 'make stop' to stop services or 'make status' to check running processes"
 
+# Check status of services
+status:
+	@echo "Service status:"
+	@pgrep -f "ws-server" > /dev/null && echo "  ws-server: running (PID: $$(pgrep -f ws-server))" || echo "  ws-server: stopped"
+	@pgrep -f "ble-listener" > /dev/null && echo "  ble-listener: running (PID: $$(pgrep -f ble-listener))" || echo "  ble-listener: stopped"
+
 # Stop both services
 stop:
 	@echo "Stopping services..."
