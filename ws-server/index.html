@@ -333,20 +333,23 @@
         const eventDiv = document.createElement('div');
         eventDiv.className = 'grid grid-cols-12 gap-4 items-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200 animate-slide-in';
 
-        if (event.button.toLowerCase() === 'a') {
+        const buttonType = event.button.toLowerCase();
+        if (buttonType === 'a') {
             eventDiv.classList.add('border-l-4', 'border-l-red-500');
+        } else if (buttonType === 'any') {
+            eventDiv.classList.add('border-l-4', 'border-l-slate-400');
         } else {
             eventDiv.classList.add('border-l-4', 'border-l-blue-500');
         }
 
-        const date = new Date(event.timestamp * 1000);
+        const date = new Date(event.timestamp);
         const timeStr = date.toLocaleTimeString();
         const dateStr = date.toLocaleDateString();
 
         eventDiv.innerHTML = `
                 <div class="col-span-12 md:col-span-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg ${event.button.toLowerCase() === 'a' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'} flex items-center justify-center font-bold text-sm">
+                        <div class="w-8 h-8 rounded-lg ${buttonType === 'a' ? 'bg-red-100 text-red-700' : buttonType === 'any' ? 'bg-slate-200 text-slate-600' : 'bg-blue-100 text-blue-700'} flex items-center justify-center font-bold text-sm">
                             ${event.button}
                         </div>
                         <div class="md:hidden">

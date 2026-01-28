@@ -61,7 +61,7 @@ Example cURL:
 ```bash
 curl -X POST http://localhost:3000/api/button \
   -H 'Content-Type: application/json' \
-  -d '{"button":"A","state":"pressed","timestamp":1728011234}'
+  -d '{"button":"A","state":"pressed","timestamp":1728011234000}'
 ```
 
 ## WebSocket API
