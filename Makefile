@@ -16,14 +16,14 @@ run: build-ws-server build-ble-listener
 # Check status of services
 status:
 	@echo "Service status:"
-	@pgrep -f "ws-server" > /dev/null && echo "  ws-server: running (PID: $$(pgrep -f ws-server))" || echo "  ws-server: stopped"
-	@pgrep -f "ble-listener" > /dev/null && echo "  ble-listener: running (PID: $$(pgrep -f ble-listener))" || echo "  ble-listener: stopped"
+	@pgrep -x "ws-server" > /dev/null && echo "  ws-server: running (PID: $$(pgrep -x ws-server))" || echo "  ws-server: stopped"
+	@pgrep -x "ble-listener" > /dev/null && echo "  ble-listener: running (PID: $$(pgrep -x ble-listener))" || echo "  ble-listener: stopped"
 
 # Stop both services
 stop:
 	@echo "Stopping services..."
-	-pkill -f "ws-server"
-	-pkill -f "ble-listener"
+	-pkill -x "ws-server"
+	-pkill -x "ble-listener"
 	@echo "Services stopped"
 
 # View logs in real-time
