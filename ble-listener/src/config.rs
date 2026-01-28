@@ -1,0 +1,4 @@
+pub const BATTERY_SERVICE_UUID: &str = "0000180F-0000-1000-8000-00805F9B34FB";
+pub const BATTERY_LEVEL_UUID: &str = "00002A19-0000-1000-8000-00805F9B34FB";
+pub const DEVICE_NAME: &str = "LGR-BLE";
+pub const WEB_SERVER_URL: &str = "http://0.0.0.0:3000/api/button";
